@@ -8,10 +8,7 @@
   --ink: #1c1a17;
   --cream-edge: #e4d8bd;
   --text: #f3e7d6;
-  --good: #6cc08a;
-  --good-bg: #214b32;
-  --bad: #e08b7e;
-  --bad-bg: #5a2620;
+  --accent: #b3892f;   /* follow-along note highlight (matches Chant Explorer) */
 }
 
 * { box-sizing: border-box; }
@@ -34,7 +31,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
 }
 
 /* ---- Masthead ---- */
@@ -48,6 +45,16 @@ body {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
 }
 .subtitle { margin: 6px 0 0; opacity: 0.82; font-style: italic; }
+
+/* ---- Piece heading ---- */
+.chant-head { text-align: center; }
+.piece-title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.25rem, 3.6vw, 1.7rem);
+  color: var(--gold-soft);
+}
+.piece-byline { margin: 4px 0 0; opacity: 0.85; font-style: italic; }
 
 /* ---- Score card (cream parchment panel for the notation) ---- */
 .score-card {
@@ -66,8 +73,27 @@ body {
   justify-content: center;
   color: var(--ink);
 }
-/* abcjs renders SVG; keep it dark ink on the parchment */
 .score svg { max-width: 100%; height: auto; }
+
+/* Whole-piece view: a full score is many systems tall — scroll it inside the card,
+   anchored to the top rather than vertically centred like the short incipit. */
+.score--scroll {
+  display: block;
+  align-items: initial;
+  justify-content: initial;
+  max-height: 62vh;
+  overflow-y: auto;
+}
+.score--scroll svg { display: block; margin: 0 auto; }
+
+/* follow-along highlight — the note currently sounding */
+.score .note-playing,
+.score .note-playing path,
+.score .note-playing ellipse {
+  fill: var(--accent);
+}
+.score .note-playing { filter: drop-shadow(0 0 2px var(--accent)); }
+.score path, .score ellipse { transition: fill 90ms linear; }
 
 .score-tools {
   display: flex;
@@ -78,6 +104,133 @@ body {
   border-top: 1px dashed var(--cream-edge);
 }
 .play-note { font-size: 0.82rem; color: #6b5d44; }
+
+/* ---- Full-piece audio transport (abcjs SynthController widget) ----
+   abcjs-basic ships no CSS for the inline audio control, so style the pieces it
+   generates to sit on the parchment card. */
+/* ---- Console view (manuals + pedalboard) ---- */
+
+.console-view {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--cream-edge);
+}
+.console-view:empty { display: none; }
+.pp-console-svg { display: block; width: 100%; height: auto; }
+
+.pp-key { stroke: rgba(42, 20, 16, 0.45); stroke-width: 0.6; }
+.pp-key--white { fill: var(--parchment); }
+.pp-key--black { fill: var(--wood-dark); stroke: rgba(42, 20, 16, 0.7); }
+
+/* A piece with no pedal part still shows the pedalboard, greyed, so the
+   absence reads as "this piece is manuals only" rather than as a bug. */
+.pp-key--idle { opacity: 0.38; }
+
+.pp-key.pp-lit { fill: var(--accent); stroke: var(--gold); }
+.pp-key--black.pp-lit { fill: var(--gold-soft); }
+.pp-key { transition: fill 90ms linear; }
+
+.pp-label {
+  fill: rgba(42, 20, 16, 0.6);
+  font: 600 9px "Segoe UI", system-ui, sans-serif;
+}
+
+.audio-control { margin-top: 10px; }
+.abcjs-inline-audio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: rgba(42, 20, 16, 0.06);
+  border: 1px solid var(--cream-edge);
+  border-radius: 9px;
+}
+.abcjs-css-warning { display: none; } /* Our inline transport has its own styles. */
+.abcjs-inline-audio .abcjs-btn {
+  background: var(--gold);
+  border: none;
+  border-radius: 6px;
+  padding: 5px 8px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.abcjs-inline-audio .abcjs-btn:hover { filter: brightness(1.06); }
+.abcjs-inline-audio .abcjs-btn svg { width: 16px; height: 16px; fill: #3a2a08; }
+.abcjs-inline-audio .abcjs-midi-selection { display: inline-flex; }
+.abcjs-midi-progress-background {
+  flex: 1;
+  height: 8px;
+  min-width: 80px;
+  background: rgba(42, 20, 16, 0.16);
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+}
+.abcjs-midi-progress-indicator {
+  position: absolute;
+  top: -3px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  background: var(--gold);
+  border: 1px solid #7a5a1e;
+  border-radius: 50%;
+}
+.abcjs-midi-clock {
+  font-size: 0.82rem;
+  color: #6b5d44;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.abcjs-midi-loop, .abcjs-midi-reset, .abcjs-midi-start, .abcjs-tempo-wrapper { display: inline-flex; align-items: center; }
+.abcjs-inline-audio .abcjs-loop-selected { outline: 2px solid var(--gold); }
+
+/* ---- Stops (registration) ---- */
+.stops-panel {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--cream-edge);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.stops-group { border: none; margin: 0; padding: 0; }
+.stops-group:has(.stops-row:empty) { display: none; }
+.stops-group legend {
+  padding: 0;
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b5d44;
+  opacity: 0.85;
+}
+.stops-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.stop-chip-input {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+.stop-chip {
+  display: inline-block;
+  background: transparent;
+  border: 1.5px solid var(--gold);
+  border-radius: 999px;
+  color: #6b4a2e;
+  padding: 6px 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.stop-chip:hover { background: rgba(214, 173, 96, 0.18); }
+.stop-chip-input:checked + .stop-chip { background: var(--gold); color: #3a2a08; }
+.stop-chip-input:focus-visible + .stop-chip { outline: 2px solid var(--gold); outline-offset: 2px; }
+.stops-hint { margin: 0; font-size: 0.82rem; color: #6b5d44; }
+.stops-reset { align-self: flex-start; font-size: 0.85rem; padding: 5px 10px; }
 
 /* ---- Buttons ---- */
 button {
@@ -98,6 +251,8 @@ button.ghost {
 }
 button.ghost:hover { background: rgba(214, 173, 96, 0.18); }
 button.ghost:disabled { opacity: 0.5; cursor: default; }
+/* ghost buttons that sit on the dark ground (Back) need light text */
+.actions button.ghost { color: var(--gold-soft); }
 
 button.primary {
   background: var(--gold);
@@ -107,87 +262,146 @@ button.primary {
 }
 button.primary:hover { filter: brightness(1.06); }
 
-/* ---- Options ---- */
-.options {
+/* ---- Info block ---- */
+.info {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.option {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-align: left;
-  padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1.5px solid rgba(231, 205, 150, 0.35);
-  border-radius: 11px;
-  color: var(--text);
-  min-height: 64px;
-  justify-content: center;
-}
-.option:hover:not(:disabled) {
-  background: rgba(214, 173, 96, 0.16);
-  border-color: var(--gold);
-}
-.option .opt-title { font-weight: 700; line-height: 1.2; }
-.option .opt-composer { font-size: 0.85rem; opacity: 0.8; font-style: italic; }
-.option .opt-num {
-  font-size: 0.72rem;
-  opacity: 0.55;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.option:disabled { cursor: default; }
-.option.correct {
-  background: var(--good-bg);
-  border-color: var(--good);
-  color: #eafaf0;
-}
-.option.wrong {
-  background: var(--bad-bg);
-  border-color: var(--bad);
-  color: #fce8e3;
-}
-.option.dim { opacity: 0.45; }
-
-/* ---- Verdict ---- */
-.verdict { text-align: center; min-height: 2.5em; }
-.result {
-  min-height: 1.5em;
-  margin: 4px 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-.result.good { color: var(--good); }
-.result.bad { color: var(--bad); }
-.fact {
-  margin: 4px auto 14px;
-  max-width: 560px;
-  font-size: 0.95rem;
-  line-height: 1.45;
-  opacity: 0.9;
-}
-
-/* ---- Stats ---- */
-.stats {
-  display: flex;
-  gap: 22px;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding: 12px 20px;
+  padding: 18px 20px;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.22);
   border: 1px solid rgba(214, 173, 96, 0.2);
 }
-.stat { display: flex; flex-direction: column; align-items: center; min-width: 54px; }
-.stat strong { font-size: 1.4rem; color: var(--gold-soft); }
-.stat span { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.78; }
+.piece-meta {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.piece-meta li { display: flex; gap: 10px; font-size: 0.95rem; line-height: 1.4; }
+.meta-label {
+  flex: 0 0 118px;
+  color: var(--gold-soft);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+  padding-top: 2px;
+}
+.meta-value { flex: 1; }
+.fact { margin: 0 0 12px; font-size: 0.95rem; line-height: 1.5; opacity: 0.92; }
+.links { margin: 0; font-size: 0.95rem; }
+.links a { color: var(--gold-soft); text-decoration: underline; }
+.links a:hover { color: #fff; }
+
+/* ---- More by this composer ---- */
+.more-by {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(214, 173, 96, 0.28);
+}
+.more-by-head {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--gold-soft);
+  opacity: 0.9;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(231, 205, 150, 0.35);
+  border-radius: 999px;
+  color: var(--text);
+  padding: 6px 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.chip:hover { background: rgba(214, 173, 96, 0.18); border-color: var(--gold); }
+/* the movement being shown: marked in place rather than dropped from the row,
+   so the chips read as the work's table of contents */
+.chip.current {
+  background: rgba(214, 173, 96, 0.22);
+  border-color: var(--gold);
+  color: var(--gold-soft);
+  cursor: default;
+}
+.chip.current:hover { background: rgba(214, 173, 96, 0.22); }
+
+/* ---- Actions ---- */
+.actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center; }
+
+/* ---- Browse panel ---- */
+.browse-panel {
+  width: 100%;
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(214, 173, 96, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.browse-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.browse-search, .browse-select {
+  font-size: 0.95rem;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(214, 173, 96, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+.browse-search { flex: 1 1 200px; min-width: 0; }
+.browse-search::placeholder { color: var(--text); opacity: 0.55; }
+.browse-select { flex: 1 1 140px; min-width: 0; }
+.browse-select option { color: var(--ink); }
+.browse-search:focus, .browse-select:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+.browse-count { margin: 0; font-size: 0.82rem; opacity: 0.7; }
+.browse-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 50vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.browse-row {
+  width: 100%;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(231, 205, 150, 0.25);
+  border-radius: 9px;
+  padding: 9px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--text);
+}
+.browse-row:hover { background: rgba(214, 173, 96, 0.18); border-color: var(--gold); }
+.browse-row-title { font-weight: 600; }
+.browse-row-meta { font-size: 0.8rem; opacity: 0.75; }
+.browse-close { align-self: center; }
 
 /* ---- Footnotes ---- */
-.hint, .draft-note { margin: 0; text-align: center; font-size: 0.82rem; opacity: 0.66; }
-.draft-note { font-style: italic; opacity: 0.5; }
+.footnotes { width: 100%; text-align: center; }
+.source-note, .draft-note, .hint {
+  margin: 4px 0;
+  font-size: 0.82rem;
+  opacity: 0.62;
+}
+.draft-note { font-style: italic; opacity: 0.48; }
+.source-note a { color: var(--gold-soft); text-decoration: underline; }
+.source-note a:hover, .source-note a:focus-visible { color: #fff; }
+#score-credit { opacity: 0.85; }
 kbd {
   background: rgba(255, 255, 255, 0.12);
   border-radius: 4px;
@@ -197,5 +411,5 @@ kbd {
 }
 
 @media (max-width: 480px) {
-  .options { grid-template-columns: 1fr; }
+  .meta-label { flex-basis: 92px; }
 }

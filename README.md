@@ -1,56 +1,53 @@
-# Name That Organ Piece
+# Pipe & Pedal
 
-A musical trivia drill: the opening bars of a famous organ/classical work appear
-as engraved notation, and you name the piece and composer from four choices. You
-can also hear the snippet played back.
+Pipe & Pedal is a small explorer of the organ repertoire. It opens to a public-domain
+organ work with its opening bars engraved on the page. Hear them on a church-organ voice
+while the notes light up, both in the score and on a drawing of the console, then read
+about the piece and wander on to other works by the same composer. There is no quiz and
+no scoring: read it, hear it, and follow where it leads.
 
-**Scoring:** one point per correct identification; tracks streak, best streak
-(saved in your browser), and accuracy.
+Pipe & Pedal replaces the earlier *Name That Organ Piece* quiz that lived here.
 
-## How to use it
+**Try it live:** <https://financeprofessormckee.github.io/Name-That-Organ-Piece/>
 
-- A short passage of notation appears at the top. Pick the matching work from the
-  four options (mouse, or number keys **1–4**).
-- **▶ Hear it** plays the passage (a church-organ voicing via the bundled synth —
-  needs an internet connection the first time, to fetch the instrument sounds).
-- After answering, the correct title, composer, and a fun fact are revealed.
-- **Enter** or **N** deals the next piece.
+## Use it
 
-No accounts, no sign-in, nothing leaves your browser.
+- **▶ Hear it** (or <kbd>Space</kbd>) plays the passage and highlights each note as it
+  sounds.
+- **🎹 Whole piece** switches from the opening bars to the complete score, for pieces
+  that have one, with a player you can pause and scrub.
+- **The console view** under the score shows two manuals and a pedalboard, with the keys
+  lighting as they play. A piece with no pedal part shows the pedalboard greyed out.
+- **🎛 Stops** lets you draw your own registration from flues, reeds, and strings.
+  **Suggested registration** puts back the one chosen for the piece.
+- **Movements** and **More by** chips step to the other movements of the same work, or
+  to other pieces by the same composer.
+- **📚 Browse** lists all 183 pieces, with a search box and filters by composer and form.
+- **🎲 Another piece** (or <kbd>N</kbd>) chooses another work at random; **← Back**
+  retraces your path, and shareable `?piece=` links return to a piece you have visited.
 
-## Editing the repertoire
+Everything runs locally in your browser. There are no accounts, tracking, or
+recordings. The first time you play something, the page fetches the instrument sounds
+from the internet; after that, your browser keeps them.
 
-All content lives in [`data/pieces.js`](data/pieces.js) — one block per piece,
-each with its title, composer, a fun fact, and the opening bars in **ABC
-notation**. There's a cheat sheet at the top of that file. To add a piece, copy a
-block and fill it in; to fix a wrong note, just edit the `abc` string.
+## Sources and rights
 
-> The opening bars shipped here are a **first-pass draft encoded from memory** —
-> please verify the notes and correct anything off. The notation never shows the
-> title or composer, so it doesn't give the answer away.
+Every work is in the public domain, by more than two dozen composers, from Tallis and
+Titelouze through Buxtehude and Bach to Mendelssohn, Franck, and Widor. The notation is converted from engravings published by the
+[Mutopia Project](https://www.mutopiaproject.org/), [IMSLP](https://imslp.org/), and the
+[PDMX](https://pnlong.github.io/PDMX.website/) score collection, and each piece names
+its score source and license on screen. Those engravings carry their own licenses:
+public domain, CC0, CC BY, or CC BY-SA. Notation derived from a CC BY-SA engraving stays
+under that license. Every score in this release was checked against its source and its
+license before publication.
 
-### Tournemire / *L'Orgue mystique* — the chant convention
+Notation and playback come from [abcjs](https://abcjs.net), an MIT-licensed
+open-source library; its license notice is included in
+[`vendor/abcjs.LICENSE`](vendor/abcjs.LICENSE). This project is released under the
+[MIT License](LICENSE).
 
-Tournemire's modal writing can't be reliably transcribed from memory, so those
-entries are handled differently: the notation shows the **Gregorian chant the
-office paraphrases** (e.g. *Ave maris stella* for the Assumption's Paraphrase-
-Carillon), not Tournemire's own notes. The game becomes "name the office from its
-proper chant," and the revealed fact explains the link. Office numbers are
-confirmed from IMSLP; the chant melodies are best-effort drafts to verify against
-the *Liber Usualis*.
+## Found a mistake?
 
-## What's bundled
-
-- `vendor/abcjs-basic-min.js` — the [abcjs](https://abcjs.net) library (v6.4.4)
-  that renders the notation and synthesizes playback. It's a single vendored
-  file, so the page is fully self-contained (no build step, no backend).
-- `vendor/abcjs.LICENSE` — abcjs is **MIT-licensed** (© 2009–2024 Paul Rosen and
-  Gregory Dyke). MIT only requires that this copyright and permission notice ship
-  alongside the code, which this file satisfies; you're free to use, deploy, and
-  modify it, including for class. No attribution is required in the page UI.
-
-## Possible future additions
-
-- A "type the answer" mode with forgiving text matching.
-- Separate the question into title and composer for two points.
-- A real organ voicing for playback, and a "harder" mode that shows fewer bars.
+Corrections are welcome: a wrong note, a misattributed piece, a missing tie, or a
+playback that stumbles. Please [open an issue](https://github.com/financeprofessormckee/Name-That-Organ-Piece/issues)
+with the piece, the bar, what looks wrong, and the score you are comparing against.

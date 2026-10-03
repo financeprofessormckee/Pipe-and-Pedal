@@ -3,48 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Name the famous organ piece from its opening bars. A musical trivia drill with notation and playback." />
-  <title>Name That Organ Piece</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="description" content="Pipe & Pedal — explore organ works. Read the opening bars, hear them played with the notes highlighting along, and wander between pieces by the same composer." />
+  <title>Pipe &amp; Pedal — an organ explorer</title>
+  <link rel="stylesheet" href="styles.css?v=1" />
 </head>
 <body>
   <main class="console">
     <header class="masthead">
-      <h1>Name That Organ Piece</h1>
-      <p class="subtitle">Read the opening bars — name the work and its composer.</p>
+      <h1>Pipe &amp; Pedal</h1>
+      <p class="subtitle">Wander the organ loft — one organ piece at a time.</p>
     </header>
 
+    <section class="chant-head">
+      <h2 id="piece-title" class="piece-title"></h2>
+      <p id="piece-byline" class="piece-byline"></p>
+    </section>
+
     <section class="score-card">
-      <div id="score" class="score" aria-label="Musical notation for the mystery piece"></div>
+      <div id="score" class="score" aria-label="Opening bars of the current organ piece"></div>
       <div class="score-tools">
         <button type="button" id="play-btn" class="ghost">▶ Hear it</button>
-        <span id="play-note" class="play-note"></span>
+        <button type="button" id="mode-toggle" class="ghost" aria-pressed="false" hidden>🎹 Whole piece</button>
+        <button type="button" id="stops-btn" class="ghost" aria-expanded="false" aria-controls="stops-panel">🎛 Stops</button>
+        <span id="play-note" class="play-note" role="status" aria-live="polite"></span>
+      </div>
+      <div id="console-view" class="console-view"></div>
+      <div id="audio-control" class="audio-control" aria-label="Full-piece playback" hidden></div>
+      <div id="stops-panel" class="stops-panel" aria-label="Organ registration" hidden>
+        <p id="stops-hint" class="stops-hint"></p>
+        <fieldset class="stops-group">
+          <legend>Flues</legend>
+          <div class="stops-row" data-family="flue"></div>
+        </fieldset>
+        <fieldset class="stops-group">
+          <legend>Reeds</legend>
+          <div class="stops-row" data-family="reed"></div>
+        </fieldset>
+        <fieldset class="stops-group">
+          <legend>Strings</legend>
+          <div class="stops-row" data-family="string"></div>
+        </fieldset>
+        <button type="button" id="stops-reset" class="ghost stops-reset">↺ Suggested registration</button>
       </div>
     </section>
 
-    <section class="options" id="options" aria-label="Answer choices">
-      <!-- option buttons injected by app.js -->
+    <section class="info" id="info" aria-label="About this piece">
+      <ul id="piece-meta" class="piece-meta"></ul>
+      <p id="fact" class="fact"></p>
+      <p id="links" class="links"></p>
+      <div id="movements" class="more-by" hidden>
+        <h3 class="more-by-head">Movements of <span id="movements-work"></span></h3>
+        <div id="movements-chips" class="chips"></div>
+      </div>
+      <div id="more-by" class="more-by" hidden>
+        <h3 class="more-by-head">More by <span id="more-by-name"></span></h3>
+        <div id="more-by-chips" class="chips"></div>
+      </div>
     </section>
 
-    <section class="verdict">
-      <p id="result" class="result" role="status" aria-live="polite"></p>
-      <p id="fact" class="fact" aria-live="polite"></p>
-      <button type="button" id="next-btn" class="primary" hidden>Next piece</button>
+    <section class="actions">
+      <button type="button" id="next-btn" class="primary">🎲 Another piece</button>
+      <button type="button" id="browse-btn" class="ghost">📚 Browse</button>
+      <button type="button" id="back-btn" class="ghost" hidden>← Back</button>
     </section>
 
-    <footer class="stats" id="stats">
-      <span class="stat"><strong id="stat-streak">0</strong><span>streak</span></span>
-      <span class="stat"><strong id="stat-best">0</strong><span>best</span></span>
-      <span class="stat"><strong id="stat-accuracy">&mdash;</strong><span>accuracy</span></span>
-      <span class="stat"><strong id="stat-rounds">0</strong><span>played</span></span>
+    <section id="browse" class="browse-panel" aria-label="Browse all pieces" hidden>
+      <div class="browse-controls">
+        <input type="text" id="browse-search" class="browse-search" placeholder="Search title or composer…" aria-label="Search title or composer">
+        <select id="browse-composer" class="browse-select" aria-label="Filter by composer">
+          <option value="">All composers</option>
+        </select>
+        <select id="browse-genre" class="browse-select" aria-label="Filter by form">
+          <option value="">All forms</option>
+        </select>
+      </div>
+      <p id="browse-count" class="browse-count"></p>
+      <ul id="browse-list" class="browse-list"></ul>
+      <button type="button" id="browse-close-btn" class="ghost browse-close">✕ Close browse</button>
+    </section>
+
+    <footer class="footnotes">
+      <p id="source-note" class="source-note"></p>
+      <p id="score-credit" class="source-note" hidden></p>
+      <p class="draft-note">Found a wrong note? Please flag it.</p>
     </footer>
 
-    <p class="hint">Pick with the mouse or keys <kbd>1</kbd>&ndash;<kbd>4</kbd>; <kbd>Enter</kbd> or <kbd>N</kbd> for the next piece.</p>
-    <p class="draft-note">The notation is a first-pass draft &mdash; flag any wrong notes and they're a quick fix.</p>
+    <p class="hint">Press <kbd>Space</kbd> to hear it, <kbd>N</kbd> for another piece.</p>
   </main>
 
   <script src="vendor/abcjs-basic-min.js"></script>
-  <script src="data/pieces.js"></script>
-  <script src="app.js"></script>
+  <script src="data/composers.js?v=12"></script>
+  <script src="data/pieces.js?v=159"></script>
+  <script src="data/stops.js?v=1"></script>
+  <script src="registration.js?v=1"></script>
+  <script src="console.js?v=1"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>
